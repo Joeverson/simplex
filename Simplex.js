@@ -43,50 +43,59 @@ module.exports = class Simplex {
       } catch (e) {
         return {
           matriz: this.table,
-          solucao: this.solucao(),
+          solucao: this.table.map(data => data[0] === 1 ? data[data.length - 1] : undefined)
+            .find(data => data !== undefined),
           status: 'Múltiplas soluções'
         }
       }
     } else {
       return {
         matriz: this.table,
-        solucao: this.solucao(),
+        solucao: this.table.map(data => data[0] === 1 ? data[data.length - 1] : undefined)
+          .find(data => data !== undefined),
           status: 'Solução ótima'
       }
     }
   }
 
 // solução do calculo simplex
-solutionCalc() {
-  const solucao = []
-  let tableColumn = []
-  let hasOnlyZeroOrOne = []
+// solutionCalc() {
+//   const solucao = []
+//   let tableColumn = []
+//   let hasOnlyZeroOrOne = []
 
-  for (let i = 1; i <= this.restrictions.length + this.naoNegativos; i++) {
-    tableColumn = this.table.map(data => data[i])
+//   for (let i = 1; i <= this.restrictions.length + this.naoNegativos; i++) {
+//     tableColumn = this.table.map(data => data[i])
 
-    // verificando se só tem 1 ou 0 para poder pegar o valor de folga e resultado
-    hasOnlyZeroOrOne = tableColumn.filter(data => data === 0 || data === 1)
+//     // verificando se só tem 1 ou 0 para poder pegar o valor de folga e resultado
+//     hasOnlyZeroOrOne = tableColumn.filter(data => data === 0 || data === 1)
 
-    if (!_.isEmpty(hasOnlyZeroOrOne)) {
-      if (hasOnlyZeroOrOne.length === tableColumn.length) {
-        // console.log('filter -->', hasOnlyZeroOrOne);
-        // console.log('all -->', tableColumn);
-        // console.log(tableColumn, i)
-        // vendo o valor de Xn
-        solucao.push({
-          folga: this.table[hasOnlyZeroOrOne.indexOf(1)][this.table[0].length - 1],
-          value: '',
-          index: ''
-        })
-      }
-    }
-  }
+//     if (!_.isEmpty(hasOnlyZeroOrOne)) {
+//       if (hasOnlyZeroOrOne.length === tableColumn.length) {
+//         // console.log('filter -->', hasOnlyZeroOrOne);
+//         // console.log('all -->', tableColumn);
+//         // console.log(tableColumn, i)
+//         // vendo o valor de Xn
+//         solucao.push({
+//           folga: i > this.restrictions.length ? this.table[hasOnlyZeroOrOne.indexOf(1)][this.table[0].length - 1] : 0,
+//           value: i <= this.restrictions.length ? this.table[hasOnlyZeroOrOne.indexOf(1)][this.table[0].length - 1] : 0,
+//           index: i
+//         })
+//       }
+//     }
+//   }
 
-  console.log(solucao);
-  
-  return solucao
-}
+
+//   console.log(solucao, this.objetiva);
+//   console.log(solucao.map(data => {
+//     console.log(this.objetiva[data.index - 1]);
+//     console.log(data.value);
+
+//     return this.objetiva[data.index - 1] * data.value
+//   }));
+
+//   return solucao
+// }
 
   // toda não negatividade deve ser >= 0
 
