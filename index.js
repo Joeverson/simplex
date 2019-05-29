@@ -6,17 +6,9 @@ const _ = require('lodash')
 
 // variaveis de ambiente
 let config = {
-  naoNegativos:  2,
-  objetiva:  [1, 2],
-  restrincao:  [{
-      coefficient: [-4, 1],
-      result: 4
-    },
-    {
-      coefficient: [2, -3],
-      result: 6
-    }
-  ]
+  naoNegativos:  '',
+  objetiva:  [],
+  restrincao:  []
 }
 
 const rl = readline.createInterface({
@@ -101,7 +93,7 @@ rl.on('line', function (line) {
     // ADICIONAR QTD VARIÁVEIS NÃO NEGATIVAS 
     case "4":
       rl.question("Informe a qtd de variáveis não negativas: ", function (answer) {
-        config.naoNegativos = answer
+        config.naoNegativos = parseInt(answer)
 
         rl.prompt()
       });
@@ -110,25 +102,19 @@ rl.on('line', function (line) {
     // CALCULAR
     case "5":
       clear()
-      const simplex = new Simplex(config.naoNegativos, config.objetiva, config.restrincao)
-      const result = simplex.calc()
-      
-      
-      console.log(`
-========================================================================================
 
-            RESULTAADO DOS CALCULOS SIMPLEX
-
-            SOLUÇÃO: ${result.solucao}
-            STATUS: ${result.status}
-
-            MATRIZ: 
-            
-${result.matriz.map(data => `\t\t${data.join('  |  ')} \n`).join('')}
-
-
-========================================================================================
-      `);
+      if (_.isEmpty(config.objetiva)) {
+        console.log('Preencha defina o valor da objetiva, precione [1] ')        
+      } 
+      else if (_.isEmpty(config.restrincao)) {
+        console.log('Preencha defina as restrinções, precione [2] ')        
+      }
+      else if (_.isEmpty(config.naoNegativos)) {
+        console.log('Preencha defina a quantidade de não negativas, precione [3] ')        
+      } else {
+        const simplex = new Simplex(config.naoNegativos, config.objetiva, config.restrincao)
+        simplex.calc()
+      }
       break;
 
     // AJUDA
@@ -142,9 +128,9 @@ ${result.matriz.map(data => `\t\t${data.join('  |  ')} \n`).join('')}
       Para poder adicionar uma formúla basta escolher a opção e colocar os valores
       separados por espaço. ex:
       
-        Formula: 2x1 + x2 - 10x3 = 20
+        Formula: 2x1 + x2 - 10x3 <= 20
 
-        Como adicionar no sistema: 2 1 -10 20
+        Como adicionar no sistema: 2 1 -10 <= 20
 
 
 ------------------------------------------------------------------------------------------
@@ -161,9 +147,18 @@ ${result.matriz.map(data => `\t\t${data.join('  |  ')} \n`).join('')}
 
 
 ========================================================================================
+                      COMANDOS
+
+    [1] ADICIONAR FORMULA OBJETIVA 
+    [2] ADICIONAR FORMULA DE RESTRINCÃO 
+    [3] LIMPAR FORMULAS DE RESTRINÇÕES 
+    [4] ADICIONAR QTD VARIÁVEIS NÃO NEGATIVAS 
+    [5] CALCULAR 
+    [6] AJUDA 
+    [0] SAIR 
+
+========================================================================================
       `);
-      console.log(config);
-      
       break;
     
     default:      

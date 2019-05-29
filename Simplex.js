@@ -1,5 +1,5 @@
 const _ = require('lodash')
-
+const Table = require('cli-table')
 module.exports = class Simplex {
   constructor(qtdNaoNegativos, objetiva, restrictions) {
     // quantidade de valores não negativos
@@ -11,20 +11,24 @@ module.exports = class Simplex {
     // toda restrinção deve ser <=
     this.restrictions = restrictions
 
+    this.cicle = 1 // quantidade de ciclos para achar o valor
+
     this.table = []
   }
 
-  calc(table, recursive) {
+  calc(self, recursive) {
 
     // atualizando table quando entra no modo recursivo
-    this.table = table || this.table
+    this.table = self ? self.table : this.table
 
     if (!recursive) {
       this.tableCalcutorBase()
     }
 
     const pivot = this.pivot()
-
+    
+    this.printCicle(this.cicle)
+    
     // retornando a nova tabel já modificada com pivot
     // e testando se esta ok com solução otima
     this.table = this.table.map((_, i) => {
@@ -34,27 +38,28 @@ module.exports = class Simplex {
         return pivot.novaLinhaPivot.value
       }
     })
-
+    
     // testando para saber se tem algum valor negativo no primeira linha caso sim 
     // vai reiniciar os calculos com a nova table
     if (this.table[0].find(data => data < 0)) {
       try {
-        return this.calc(this.table, true)
+        this.cicle++
+        return this.calc(this, true)
       } catch (e) {
-        return {
+        this.print({
           matriz: this.table,
           solucao: this.table.map(data => data[0] === 1 ? data[data.length - 1] : undefined)
             .find(data => data !== undefined),
           status: 'Múltiplas soluções'
-        }
+        })
       }
     } else {
-      return {
+      this.print({
         matriz: this.table,
         solucao: this.table.map(data => data[0] === 1 ? data[data.length - 1] : undefined)
           .find(data => data !== undefined),
-          status: 'Solução ótima'
-      }
+        status: 'Solução ótima'
+      })
     }
   }
 
@@ -151,19 +156,21 @@ module.exports = class Simplex {
 
     this.table.map((data, index) => {
       if (index !== 0) { // lendo a linque que não seja a primeira
-        let calcPivot = data[data.length - 1] / data[linhaEntra]
-        calcPivot >= 0 ? resultCalc.push({
-          result: calcPivot,
-          value: data[linhaEntra],
-          index
-        }) : undefined
+        if (data[linhaEntra] !==0) {
+          let calcPivot = data[data.length - 1] / data[linhaEntra]
+          calcPivot >= 0 ? resultCalc.push({
+            result: calcPivot,
+            value: data[linhaEntra],
+            index
+          }) : undefined
+        }
       }
     })
     
     // linha pivot original
     pivot = _.minBy(resultCalc, o => o.result)
     
-    if (!pivot) throw 'treta'
+    // if (!pivot) throw 'treta'
 
     return {
       ...pivot,
@@ -183,5 +190,59 @@ module.exports = class Simplex {
     })
 
     return novaPrimeiraLinha
+  }
+
+  /**
+   * Print table of the user
+   * see what the informations
+   * */
+  printTable(data) {
+    const tableuOrigin = data || [...this.table]
+
+    const headers = []
+    for (let i = 1; i <= this.naoNegativos + this.restrictions.length; i++) { // criando um array com os headers da table tableu
+      headers.push(`x${i}`)
+    } 
+
+    // instantiate
+    const table = new Table({
+      head: [...headers, 'b']
+    })
+
+    // inserindo cada linha no tableView
+    tableuOrigin.map(data => {
+      table.push(data.slice(1))
+    })
+    
+    if (data) {
+      return table.toString()
+    } else {
+      console.log(table.toString())
+    }
+  }
+
+  print (data) {
+    console.log(`
+========================================================================================
+
+            RESULTADO DOS CALCULOS SIMPLEX
+
+            SOLUÇÃO: ${data.solucao}
+            STATUS: ${data.status}
+
+            TABLEU:            
+${this.printTable(data.matriz)}
+      `);
+  }
+
+  printCicle (i) {
+    console.log(`
+========================================================================================
+
+            CICLO ${i}
+
+            TABLEU:            
+${this.printTable(this.table)}
+      `);
   }
 }

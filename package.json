@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cli-table": "^0.3.1",
     "cowsay": "^1.4.0",
     "lodash": "^4.17.11",
     "simple-simplex": "^1.0.1"
