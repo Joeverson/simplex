@@ -8,7 +8,7 @@ module.exports = class Simplex {
     // valor de objetiva
     this.objetiva = objetiva
 
-    // toda restrinção deve ser <=
+    // toda restrição deve ser <=
     this.restrictions = restrictions
 
     this.cicle = 1 // quantidade de ciclos para achar o valor
@@ -26,10 +26,10 @@ module.exports = class Simplex {
     }
 
     const pivot = this.pivot()
-    
+
     this.printCicle(this.cicle)
-    
-    // retornando a nova tabel já modificada com pivot
+
+    // retornando o novo table já modificado com pivot
     // e testando se esta ok com solução otima
     this.table = this.table.map((_, i) => {
       if (pivot.novaLinhaPivot.index !== i) {
@@ -38,9 +38,9 @@ module.exports = class Simplex {
         return pivot.novaLinhaPivot.value
       }
     })
-    
+
     // testando para saber se tem algum valor negativo no primeira linha caso sim 
-    // vai reiniciar os calculos com a nova table
+    // vai reiniciar os calculos com o novo tableau
     if (this.table[0].find(data => data < 0)) {
       try {
         this.cicle++
@@ -63,49 +63,49 @@ module.exports = class Simplex {
     }
   }
 
-// solução do calculo simplex
-// solutionCalc() {
-//   const solucao = []
-//   let tableColumn = []
-//   let hasOnlyZeroOrOne = []
+  // solução do calculo simplex
+  // solutionCalc() {
+  //   const solucao = []
+  //   let tableColumn = []
+  //   let hasOnlyZeroOrOne = []
 
-//   for (let i = 1; i <= this.restrictions.length + this.naoNegativos; i++) {
-//     tableColumn = this.table.map(data => data[i])
+  //   for (let i = 1; i <= this.restrictions.length + this.naoNegativos; i++) {
+  //     tableColumn = this.table.map(data => data[i])
 
-//     // verificando se só tem 1 ou 0 para poder pegar o valor de folga e resultado
-//     hasOnlyZeroOrOne = tableColumn.filter(data => data === 0 || data === 1)
+  //     // verificando se só tem 1 ou 0 para poder pegar o valor de folga e resultado
+  //     hasOnlyZeroOrOne = tableColumn.filter(data => data === 0 || data === 1)
 
-//     if (!_.isEmpty(hasOnlyZeroOrOne)) {
-//       if (hasOnlyZeroOrOne.length === tableColumn.length) {
-//         // console.log('filter -->', hasOnlyZeroOrOne);
-//         // console.log('all -->', tableColumn);
-//         // console.log(tableColumn, i)
-//         // vendo o valor de Xn
-//         solucao.push({
-//           folga: i > this.restrictions.length ? this.table[hasOnlyZeroOrOne.indexOf(1)][this.table[0].length - 1] : 0,
-//           value: i <= this.restrictions.length ? this.table[hasOnlyZeroOrOne.indexOf(1)][this.table[0].length - 1] : 0,
-//           index: i
-//         })
-//       }
-//     }
-//   }
+  //     if (!_.isEmpty(hasOnlyZeroOrOne)) {
+  //       if (hasOnlyZeroOrOne.length === tableColumn.length) {
+  //         // console.log('filter -->', hasOnlyZeroOrOne);
+  //         // console.log('all -->', tableColumn);
+  //         // console.log(tableColumn, i)
+  //         // vendo o valor de Xn
+  //         solucao.push({
+  //           folga: i > this.restrictions.length ? this.table[hasOnlyZeroOrOne.indexOf(1)][this.table[0].length - 1] : 0,
+  //           value: i <= this.restrictions.length ? this.table[hasOnlyZeroOrOne.indexOf(1)][this.table[0].length - 1] : 0,
+  //           index: i
+  //         })
+  //       }
+  //     }
+  //   }
 
 
-//   console.log(solucao, this.objetiva);
-//   console.log(solucao.map(data => {
-//     console.log(this.objetiva[data.index - 1]);
-//     console.log(data.value);
+  //   console.log(solucao, this.objetiva);
+  //   console.log(solucao.map(data => {
+  //     console.log(this.objetiva[data.index - 1]);
+  //     console.log(data.value);
 
-//     return this.objetiva[data.index - 1] * data.value
-//   }));
+  //     return this.objetiva[data.index - 1] * data.value
+  //   }));
 
-//   return solucao
-// }
+  //   return solucao
+  // }
 
   // toda não negatividade deve ser >= 0
 
   tableCalcutorBase() {
-    // ---- primeira linha da table ----
+    // ---- primeira linha do tableau ----
 
     // lendo objetiva
     let tableTemp = [1] // variable Z
@@ -116,13 +116,13 @@ module.exports = class Simplex {
 
     tableTemp.push(0) // variable b
 
-    // gravando promeira linha
+    // gravando primeira linha
     this.table.push(tableTemp)
 
-    // ---- restante da table ----
+    // ---- restante do tableau ----
 
     this.restrictions.forEach((restriction, restrictionsIndex) => {
-      tableTemp = [0] // variavel Z linha seguinte da table
+      tableTemp = [0] // variavel Z linha seguinte do tableau
 
       for (var i = 0; i < this.restrictions.length + this.naoNegativos; i++) {
         tableTemp.push(restriction.coefficient[i] ?
@@ -134,7 +134,7 @@ module.exports = class Simplex {
   }
 
   pivot() {
-    // pegando o linha que entra com base na table
+    // pegando a linha que entra com base no tableau
     let linhaEntra = {
       index: this.table[0].indexOf(_.min(this.table[0])),
       value: _.min(this.table[0])
@@ -155,8 +155,8 @@ module.exports = class Simplex {
     let pivot = 0
 
     this.table.map((data, index) => {
-      if (index !== 0) { // lendo a linque que não seja a primeira
-        if (data[linhaEntra] !==0) {
+      if (index !== 0) { // lendo a linha que não seja a primeira
+        if (data[linhaEntra] !== 0) {
           let calcPivot = data[data.length - 1] / data[linhaEntra]
           calcPivot >= 0 ? resultCalc.push({
             result: calcPivot,
@@ -166,10 +166,10 @@ module.exports = class Simplex {
         }
       }
     })
-    
+
     // linha pivot original
     pivot = _.minBy(resultCalc, o => o.result)
-    
+
     // if (!pivot) throw 'treta'
 
     return {
@@ -200,20 +200,20 @@ module.exports = class Simplex {
     const tableuOrigin = data || [...this.table]
 
     const headers = []
-    for (let i = 1; i <= this.naoNegativos + this.restrictions.length; i++) { // criando um array com os headers da table tableu
+    for (let i = 1; i <= this.naoNegativos + this.restrictions.length; i++) { // criando um array com os headers do tableau
       headers.push(`x${i}`)
-    } 
+    }
 
     // instantiate
     const table = new Table({
       head: [...headers, 'b']
     })
 
-    // inserindo cada linha no tableView
+    // inserindo cada linha no tableau
     tableuOrigin.map(data => {
       table.push(data.slice(1))
     })
-    
+
     if (data) {
       return table.toString()
     } else {
@@ -221,7 +221,7 @@ module.exports = class Simplex {
     }
   }
 
-  print (data) {
+  print(data) {
     console.log(`
 ========================================================================================
 
@@ -230,18 +230,18 @@ module.exports = class Simplex {
             SOLUÇÃO: ${data.solucao}
             STATUS: ${data.status}
 
-            TABLEU:            
+            TABLEAU:            
 ${this.printTable(data.matriz)}
       `);
   }
 
-  printCicle (i) {
+  printCicle(i) {
     console.log(`
 ========================================================================================
 
             CICLO ${i}
 
-            TABLEU:            
+            TABLEAU:            
 ${this.printTable(this.table)}
       `);
   }
