@@ -6,9 +6,18 @@ const _ = require('lodash')
 
 // variaveis de ambiente
 let config = {
-  naoNegativos: '',
-  objetiva: [],
-  restricao: []
+  naoNegativos: 2,
+  objetiva: ['2','3'],
+  restricao: [{
+    coefficient: ['1','2'],
+    signal: '',
+    result: '4'
+  },
+  {
+    coefficient: ['1', '1'],
+    signal: '',
+    result: '3'
+  }]
 }
 
 const rl = readline.createInterface({
@@ -67,11 +76,16 @@ rl.on('line', function (line) {
       // ADICIONANDO RESTRIÇÃO
     case "2":
       rl.question("Informe a restrição: ", function (answer) {
-        const data = answer.split(' ')
+        const arrayValues = answer.split(' ')
+
+        // preparando as informações que estão entrando para ajustar a função de restrição
+        const signal = arrayValues.find(data => data === '<=' || data === '>=' || data === '=')
+        const data = arrayValues.filter(data => parseInt(data))
         const lastData = data.pop()
 
-        config.restrincao.push({
+        config.restricao.push({
           coefficient: data,
+          signal,
           result: lastData
         })
 
@@ -101,13 +115,13 @@ rl.on('line', function (line) {
 
       // CALCULAR
     case "5":
-      clear()
+      // clear()
 
       if (_.isEmpty(config.objetiva)) {
         console.log('Preencha  o valor da função objetivo, pressione [1] ')
       } else if (_.isEmpty(config.restricao)) {
         console.log('Preencha  as restrições, pressione [2] ')
-      } else if (_.isEmpty(config.naoNegativos)) {
+      } else if (config.naoNegativos === null) {
         console.log('Preencha  a quantidade de não negativas, pressione [3] ')
       } else {
         const simplex = new Simplex(config.naoNegativos, config.objetiva, config.restricao)
@@ -157,6 +171,8 @@ rl.on('line', function (line) {
 
 ========================================================================================
       `);
+      console.log(JSON.stringify(config));
+      
       break;
 
     default:

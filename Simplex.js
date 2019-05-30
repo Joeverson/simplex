@@ -26,9 +26,9 @@ module.exports = class Simplex {
     }
 
     const pivot = this.pivot()
-
+    
     this.printCicle(this.cicle)
-
+    
     // retornando o novo table já modificado com pivot
     // e testando se esta ok com solução otima
     this.table = this.table.map((_, i) => {
@@ -38,7 +38,8 @@ module.exports = class Simplex {
         return pivot.novaLinhaPivot.value
       }
     })
-
+    
+    console.log(this.table);
     // testando para saber se tem algum valor negativo no primeira linha caso sim 
     // vai reiniciar os calculos com o novo tableau
     if (this.table[0].find(data => data < 0)) {
@@ -111,7 +112,7 @@ module.exports = class Simplex {
     let tableTemp = [1] // variable Z
 
     for (var i = 0; i < this.restrictions.length + this.naoNegativos; i++) {
-      tableTemp.push(this.objetiva[i] ? (this.objetiva[i] * -1) : 0)
+      tableTemp.push(this.objetiva[i] ? (parseInt(this.objetiva[i]) * -1) : 0)
     }
 
     tableTemp.push(0) // variable b
@@ -126,9 +127,12 @@ module.exports = class Simplex {
 
       for (var i = 0; i < this.restrictions.length + this.naoNegativos; i++) {
         tableTemp.push(restriction.coefficient[i] ?
-          restriction.coefficient[i] : (restrictionsIndex + this.restrictions.length == i ? 1 : 0))
+          parseInt(restriction.coefficient[i]): (restrictionsIndex + this.restrictions.length == i ? 1 : 0))
       }
-      tableTemp.push(restriction.result)
+      // adicionando o resultado da função no tablaeu
+      tableTemp.push(parseInt(restriction.result))
+
+      // adicionando a linha no tablaeu
       this.table.push(tableTemp)
     })
   }
@@ -139,8 +143,11 @@ module.exports = class Simplex {
       index: this.table[0].indexOf(_.min(this.table[0])),
       value: _.min(this.table[0])
     }
+    console.log(linhaEntra);
+    
     let novaLinhaPivot = this.linePivotCalc(linhaEntra.index)
-
+    console.log(novaLinhaPivot);
+    
     return {
       novaLinhaPivot,
       linhaEntra
